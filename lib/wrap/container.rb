@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module TFB
+module Wrap
   module Container
     def register_command(json)
       @commands ||= []

@@ -6,7 +6,7 @@ class WebSocket::Client::Simple::Client
   attr_reader :thread
 end
 
-module TFB
+module Wrap
   class Gateway
     DEFAULT_GATEWAY_URL = 'wss://gateway.discord.gg/?v=9&encoding=json'
 
@@ -20,9 +20,8 @@ module TFB
       HELLO = 10
     end
 
-    def initialize(bot, intents)
+    def initialize(bot)
       @bot = bot
-      @intents = intents
       @gateway_url = @bot.api_call('Get', 'gateway')['url']
     end
 
@@ -124,7 +123,7 @@ module TFB
         d: {
           token: @bot.token,
           properties: { '$os' => 'linux' },
-          intents: @intents
+          intents: @bot.intents
         }
       )
       LOGGER.debug('Sent Identify')

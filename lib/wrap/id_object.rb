@@ -1,4 +1,4 @@
-module TFB
+module Wrap
   module IDObject
     attr_reader :id, :data
 

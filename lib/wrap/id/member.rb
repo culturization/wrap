@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module TFB
+module Wrap
   class Member
     attr_reader :guild_id, :user_id, :data
 

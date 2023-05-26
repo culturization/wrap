@@ -1,24 +1,23 @@
 # frozen_string_literal: true
 
-module TFB
-  class Bot
+module Wrap
+  module Bot
     include API
 
-    attr_reader :token, :db, :ratelimits
+    attr_reader :token, :ratelimits, :intents
 
     def initialize(token, config)
       @token = token
       @config = config
 
-      @db = SQLite3::Database.new(config['db'])
-
       @command_handlers = {}
       @commands = []
 
-      include(Container::Misc, Container::Moderation)
-
       @ratelimits = {}
-      @gateway = TFB::Gateway.new(self, config['intents'])
+
+      @intents ||= 0
+
+      @gateway = TFB::Gateway.new(self, @intents)
     end
 
     def include(*containers)
@@ -29,8 +28,6 @@ module TFB
     end
 
     def run
-      app(@config['app_id']).bulk_overwrite(@commands)
-
       @gateway.run
     end
 
@@ -40,6 +37,9 @@ module TFB
 
     def dispatch(event, data)
       case event
+      when 'READY'
+        # save application
+        @app =
       when 'MESSAGE_CREATE'
       when 'INTERACTION_CREATE'
         handler = @command_handlers[data['data']['name']]
@@ -51,6 +51,7 @@ module TFB
       end
     end
 
+    # default wrap_msg
     def wrap_msg(resp)
       { type: 4, data: { content: resp } }
     end
@@ -72,7 +73,7 @@ module TFB
     end
 
     def overwrite_commands
-      app(@config['app_id']).bulk_overwrite(@commands)
+      @app.bulk_overwrite(@commands)
     end
   end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module TFB
+module Wrap
   module Errors
     class DiscordError < StandardError
       attr_reader :message

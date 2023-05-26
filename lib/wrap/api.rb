@@ -1,4 +1,4 @@
-module TFB
+module Wrap
   module API
     API_BASE = 'https://discord.com/api/v10/'
 

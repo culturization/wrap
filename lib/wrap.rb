@@ -16,7 +16,7 @@ Dir['./lib/id/*.rb', './lib/containers/*.rb'].each { |f| require f }
 
 require './lib/bot'
 
-module TFB
+module Wrap
   LOGGER = Logger.new(STDOUT)
   LOGGER.level = Logger::DEBUG
   VERSION = '0.2'
