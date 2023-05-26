@@ -23,13 +23,13 @@ module Wrap
       @type = option['type']
       @focused = option['focused']
 
-      if @type == OptionTypes::SUB_COMMAND, OptionTypes::SUB_COMMAND_GROUP
-        @options = option['options'].map.to_h { [ _1[:name], self.class.new(_1) ] }
+      if [OptionTypes::SUB_COMMAND, OptionTypes::SUB_COMMAND_GROUP].include?(@type)
+        @options = option['options'].map.to_h { [_1[:name], self.class.new(_1)] }
       else
         @value = option['value']
       end
     end
-    
+
     def [](key)
       @options[key]
     end

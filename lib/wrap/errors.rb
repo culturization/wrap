@@ -33,15 +33,15 @@ module Wrap
     end
 
     def find_err(message, code)
-      return @classes[code].new(message) if @classes && @classes.has_key?(code)
-     
+      return @classes[code].new(message) if @classes&.key?(code)
+
       OtherError.new(message, code)
     end
 
     UnknownError = create_err(0)
 
-    UnknownMember = create_err(10007)
+    UnknownMember = create_err(10_007)
 
-    MissingPermissions = create_err(50013)
+    MissingPermissions = create_err(50_013)
   end
 end

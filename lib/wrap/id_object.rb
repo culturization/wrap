@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Wrap
   module IDObject
     attr_reader :id, :data

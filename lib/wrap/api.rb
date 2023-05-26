@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Wrap
   module API
     API_BASE = 'https://discord.com/api/v10/'
@@ -5,9 +7,9 @@ module Wrap
     def api_call(method, path, rl_key = nil, data = nil)
       rl = @ratelimits[rl_key]
 
-      if rl && rl[:reset] > Time.now && rl[:remaining] == 0
+      if rl && rl[:reset] > Time.now && (rl[:remaining]).zero?
         LOGGER.error("Ratelimit exceeded, key: #{rl_key}")
-        raise RateLimitError.new(rl)
+        raise RateLimitError, rl
       end
 
       res = raw_api_call(method, path, token, data)
@@ -19,14 +21,12 @@ module Wrap
 
       json = JSON.parse(res.body) if res.body
 
-      if res.is_a?(Net::HTTPSuccess)
-        json
-      else
-        raise Errors.find_err(json['message'], json['code'])
-      end
+      raise Errors.find_err(json['message'], json['code']) unless res.is_a?(Net::HTTPSuccess)
+
+      json
     end
 
-    def raw_api_call(method, path, token, data)
+    def raw_api_call(method, path, _token, data)
       uri = URI.join(API_BASE, path)
 
       http = Net::HTTP.new(uri.hostname, uri.port)

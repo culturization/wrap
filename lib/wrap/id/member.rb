@@ -20,7 +20,7 @@ module Wrap
       member_roles = @data['roles']
 
       roles.select { |role| member_roles.include?(role['id']) }
-        .max_by { |role| role['position']}
+           .max_by { |role| role['position'] }
     end
 
     def ban

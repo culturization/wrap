@@ -4,20 +4,20 @@ require 'logger'
 require 'websocket-client-simple'
 require 'json'
 require 'net/http'
-require 'sqlite3'
-require './lib/gateway'
-require './lib/api'
-require './lib/errors'
-require './lib/id_object'
-require './lib/container'
-require './lib/options'
 
-Dir['./lib/id/*.rb', './lib/containers/*.rb'].each { |f| require f }
+require './lib/wrap/version'
+require './lib/wrap/gateway'
+require './lib/wrap/api'
+require './lib/wrap/errors'
+require './lib/wrap/id_object'
+require './lib/wrap/container'
+require './lib/wrap/option'
 
-require './lib/bot'
+Dir['./wrap/id/*.rb'].sort.each { |f| require f }
+
+require './lib/wrap/bot'
 
 module Wrap
-  LOGGER = Logger.new(STDOUT)
+  LOGGER = Logger.new($stdout)
   LOGGER.level = Logger::DEBUG
-  VERSION = '0.2'
 end

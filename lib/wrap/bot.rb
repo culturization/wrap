@@ -4,7 +4,7 @@ module Wrap
   module Bot
     include API
 
-    attr_reader :token, :ratelimits, :intents
+    attr_reader :token, :ratelimits, :intents, :app
 
     def initialize(token, config)
       @token = token
@@ -39,7 +39,7 @@ module Wrap
       case event
       when 'READY'
         # save application
-        @app =
+        @app = app(nil, data)
       when 'MESSAGE_CREATE'
       when 'INTERACTION_CREATE'
         handler = @command_handlers[data['data']['name']]

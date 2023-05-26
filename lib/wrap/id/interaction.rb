@@ -13,9 +13,9 @@ module Wrap
     end
 
     attr_reader :application, :type, :guild, :channel, :member, :user, :token, :version, :message,
-      :app_permissions, :locale, :guild_locale,
-      :command_id, :command_name, :command_type, :resolved, :command_options,
-      :custom_id, :component_type, :values, :components
+                :app_permissions, :locale, :guild_locale,
+                :command_id, :command_name, :command_type, :resolved, :command_options,
+                :custom_id, :component_type, :values, :components
 
     def initialize(...)
       super(...)
@@ -47,7 +47,7 @@ module Wrap
         @command_name = inner_data['name']
         @command_type = inner_data['type']
         @resolved = inner_data['resolved']
-        @command_options = inner_data['options'].map.to_h { [ _1[:name], CommandOption.new(_1) ] }
+        @command_options = inner_data['options'].map.to_h { [_1[:name], CommandOption.new(_1)] }
       when InteractionTypes::MESSAGE_COMPONENT
         @custom_id = inner_data['custom_id']
         @component_type = inner_data['component_type']
@@ -57,7 +57,7 @@ module Wrap
         @components = inner_data['components']
       end
     end
-  
+
     def reply(token, msg)
       @bot.api_call('Post', "interactions/#{@id}/#{token}/callback", nil, msg)
     end
