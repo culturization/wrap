@@ -13,7 +13,7 @@ module Wrap
     end
 
     def member(user_id, data = {})
-      Member.new(@bot, self, user_id, data)
+      Wrap::Member.new(@bot, self, user_id, data)
     end
   end
 end

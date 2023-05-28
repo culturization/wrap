@@ -16,7 +16,7 @@ module Wrap
 
       @intents ||= 0
 
-      @gateway = TFB::Gateway.new(self, @intents)
+      @gateway = Wrap::Gateway.new(self, @intents)
     end
 
     def include_containers(*containers)
@@ -56,19 +56,19 @@ module Wrap
     end
 
     def channel(id, data = {})
-      Channel.new(self, id, data)
+      Wrap::Channel.new(self, id, data)
     end
 
     def guild(id, data = {})
-      Guild.new(self, id, data)
+      Wrap::Guild.new(self, id, data)
     end
 
     def app(id, data = {})
-      Application.new(self, id, data)
+      Wrap::Application.new(self, id, data)
     end
 
     def interaction(id, data = {})
-      Interaction.new(self, id, data)
+      Wrap::Interaction.new(self, id, data)
     end
 
     def overwrite_commands

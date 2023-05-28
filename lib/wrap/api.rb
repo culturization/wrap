@@ -8,7 +8,7 @@ module Wrap
       rl = @ratelimits[rl_key]
 
       if rl && rl[:reset] > Time.now && (rl[:remaining]).zero?
-        LOGGER.error("Ratelimit exceeded, key: #{rl_key}")
+        Wrap::LOGGER.error("Ratelimit exceeded, key: #{rl_key}")
         raise RateLimitError, rl
       end
 
@@ -21,7 +21,7 @@ module Wrap
 
       json = JSON.parse(res.body) if res.body
 
-      raise Errors.find_err(json['message'], json['code']) unless res.is_a?(Net::HTTPSuccess)
+      raise Wrap::Errors.find_err(json['message'], json['code']) unless res.is_a?(Net::HTTPSuccess)
 
       json
     end

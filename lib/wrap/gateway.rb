@@ -41,7 +41,7 @@ module Wrap
     end
 
     def close(reason = nil)
-      LOGGER.warn("Connection closed by client#{", reason: #{reason}" if reason}")
+      Wrap::LOGGER.warn("Connection closed by client#{", reason: #{reason}" if reason}")
       @ws.close
     end
 
@@ -60,11 +60,11 @@ module Wrap
       @ws = WebSocket::Client::Simple.connect(@gateway_url)
 
       @ws.on(:message, &method(:handle_message))
-      @ws.on(:open) { LOGGER.info('Connected') }
-      @ws.on(:error) { |e| LOGGER.error(e.full_message) }
+      @ws.on(:open) { Wrap::LOGGER.info('Connected') }
+      @ws.on(:error) { |e| Wrap::LOGGER.error(e.full_message) }
 
       @ws.on(:close) do |e|
-        LOGGER.warn("Disconnected from server: #{e}")
+        Wrap::LOGGER.warn("Disconnected from server: #{e}")
         @heartbeat_thread&.kill
       end
 
@@ -77,7 +77,7 @@ module Wrap
       case payload['op']
       when Opcode::DISPATCH
         if payload['t'] == 'READY'
-          LOGGER.info('Ready')
+          Wrap::LOGGER.info('Ready')
           @session_id = payload['d']['session_id']
           @gateway_url = payload['d']['resume_gateway_url']
         end
@@ -85,15 +85,15 @@ module Wrap
         @seq = payload['s']
         @bot.dispatch(payload['t'], payload['d'])
       when Opcode::RECONNECT
-        LOGGER.warn('Received Reconnect')
+        Wrap::LOGGER.warn('Received Reconnect')
         @resume = true
         reconnect('reconnect')
       when Opcode::INVALID_SESSION
         @resume = payload['d']
-        LOGGER.warn("Received Invalid Session, connection is#{' not' unless @resume} resumable")
+        Wrap::LOGGER.warn("Received Invalid Session, connection is#{' not' unless @resume} resumable")
         reconnect('invalid session')
       when Opcode::HELLO
-        LOGGER.debug('Hello')
+        Wrap::LOGGER.debug('Hello')
         setup_heartbeat(payload)
 
         if @resume
@@ -107,7 +107,6 @@ module Wrap
 
     def send_heartbeat
       send('op' => Opcode::HEARTBEAT, 'd' => @seq)
-      LOGGER.debug('Sent Heartbeat')
     end
 
     def setup_heartbeat(payload)
@@ -130,7 +129,7 @@ module Wrap
           intents: @bot.intents
         }
       )
-      LOGGER.debug('Sent Identify')
+      Wrap::LOGGER.debug('Sent Identify')
     end
 
     def send_resume
@@ -142,7 +141,7 @@ module Wrap
           seq: @seq
         }
       )
-      LOGGER.debug('Sent Resume')
+      Wrap::LOGGER.debug('Sent Resume')
     end
   end
 end
