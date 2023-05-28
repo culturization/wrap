@@ -20,7 +20,7 @@ module Wrap
       @gateway = TFB::Gateway.new(self, @intents)
     end
 
-    def include(*containers)
+    def include_containers(*containers)
       containers.each do |cont|
         @command_handlers.merge!(cont.instance_variable_get(:@command_handlers))
         @commands.concat(cont.instance_variable_get(:@commands))
@@ -46,7 +46,7 @@ module Wrap
 
         return if handler.nil?
 
-        resp = handler.call(self, data)
+        resp = handler.call(self, interaction(nil ,data))
         interaction(data['id']).reply(data['token'], wrap_msg(resp))
       end
     end
