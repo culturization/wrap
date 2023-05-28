@@ -6,9 +6,8 @@ module Wrap
 
     attr_reader :token, :ratelimits, :intents, :app
 
-    def initialize(token, config)
+    def initialize(token)
       @token = token
-      @config = config
 
       @command_handlers = {}
       @commands = []
