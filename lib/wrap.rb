@@ -5,17 +5,21 @@ require 'websocket-client-simple'
 require 'json'
 require 'net/http'
 
-require './lib/wrap/version'
-require './lib/wrap/gateway'
-require './lib/wrap/api'
-require './lib/wrap/errors'
-require './lib/wrap/id_object'
-require './lib/wrap/container'
-require './lib/wrap/option'
+require 'wrap/version'
+require 'wrap/gateway'
+require 'wrap/api'
+require 'wrap/errors'
+require 'wrap/id_object'
+require 'wrap/container'
+require 'wrap/version'
 
-Dir['./wrap/id/*.rb'].sort.each { |f| require f }
+require 'wrap/id/application'
+require 'wrap/id/channel'
+require 'wrap/id/guild'
+require 'wrap/id/interaction'
+require 'wrap/id/member'
 
-require './lib/wrap/bot'
+require 'wrap/bot'
 
 module Wrap
   LOGGER = Logger.new($stdout)

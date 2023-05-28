@@ -84,17 +84,14 @@ module Wrap
 
         @seq = payload['s']
         @bot.dispatch(payload['t'], payload['d'])
-
       when Opcode::RECONNECT
         LOGGER.warn('Received Reconnect')
         @resume = true
         reconnect('reconnect')
-
       when Opcode::INVALID_SESSION
         @resume = payload['d']
         LOGGER.warn("Received Invalid Session, connection is#{' not' unless @resume} resumable")
         reconnect('invalid session')
-
       when Opcode::HELLO
         LOGGER.debug('Hello')
         setup_heartbeat(payload)
