@@ -16,7 +16,7 @@ module Wrap
 
       @intents ||= 0
 
-      @gateway = Wrap::Gateway.new(self, @intents)
+      @gateway = Wrap::Gateway.new(self)
     end
 
     def include_containers(*containers)
