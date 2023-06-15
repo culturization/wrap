@@ -28,7 +28,7 @@ module Wrap
       @type = @data['type']
       @guild = Guild.new(@bot, @data['guild_id'])
       @channel = Channel.new(@bot, @data['channel'])
-      @member = @guild.member(nil, @data['member'])
+      @member = @guild.member(nil, @data['member']) if @data['member']
       @user = @data['user'] # TODO: user object
       @token = @data['token']
       @version = @data['version']
@@ -47,7 +47,7 @@ module Wrap
         @command_name = inner_data['name']
         @command_type = inner_data['type']
         @resolved = inner_data['resolved']
-        @command_options = inner_data['options'].map.to_h { [_1[:name], Wrap::CommandOption.new(_1)] }
+        @command_options = inner_data['options'].map.to_h { [_1['name'], Wrap::CommandOption.new(_1)] }
       when InteractionTypes::MESSAGE_COMPONENT
         @custom_id = inner_data['custom_id']
         @component_type = inner_data['component_type']
@@ -58,8 +58,8 @@ module Wrap
       end
     end
 
-    def reply(token, msg)
-      @bot.api_call('Post', "interactions/#{@id}/#{token}/callback", nil, msg)
+    def reply(msg)
+      @bot.api_call('Post', "interactions/#{@id}/#{@token}/callback", nil, msg)
     end
   end
 end

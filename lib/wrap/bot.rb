@@ -45,8 +45,9 @@ module Wrap
 
         return if handler.nil?
 
-        resp = handler.call(self, interaction(nil ,data))
-        interaction(data['id']).reply(data['token'], wrap_msg(resp))
+        act = interaction(nil, data)
+        resp = handler.call(self, act)
+        act.reply(wrap_msg(resp))
       end
     end
 

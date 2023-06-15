@@ -15,7 +15,7 @@ module Wrap
       res = raw_api_call(method, path, token, data)
 
       @ratelimits[rl_key] = {
-        remaining: res['X-RateLimit-Remaining'],
+        remaining: res['X-RateLimit-Remaining'].to_i,
         reset: Time.at(res['X-Ratelimit-Reset'].to_i)
       }
 
