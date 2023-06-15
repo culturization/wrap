@@ -47,7 +47,7 @@ module Wrap
         @command_name = inner_data['name']
         @command_type = inner_data['type']
         @resolved = inner_data['resolved']
-        @command_options = inner_data['options'].map.to_h { [_1[:name], CommandOption.new(_1)] }
+        @command_options = inner_data['options'].map.to_h { [_1[:name], Wrap::CommandOption.new(_1)] }
       when InteractionTypes::MESSAGE_COMPONENT
         @custom_id = inner_data['custom_id']
         @component_type = inner_data['component_type']

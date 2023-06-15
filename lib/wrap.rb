@@ -11,7 +11,7 @@ require 'wrap/api'
 require 'wrap/errors'
 require 'wrap/id_object'
 require 'wrap/container'
-require 'wrap/version'
+require 'wrap/option'
 
 require 'wrap/id/application'
 require 'wrap/id/channel'
