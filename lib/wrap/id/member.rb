@@ -13,6 +13,8 @@ module Wrap
 
     def get
       @data = @bot.api_call('Get', "guilds/#{@guild.id}/members/#{user_id}", [:g, @guild.id])
+    rescue Wrap::Errors::UnknownMember
+      nil
     end
 
     def highest_role(roles = nil)

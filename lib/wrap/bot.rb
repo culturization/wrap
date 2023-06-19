@@ -12,17 +12,23 @@ module Wrap
       @command_handlers = {}
       @commands = []
 
+      @event_handlers = {}
+
       @ratelimits = {}
 
       @intents ||= 0
-
       @gateway = Wrap::Gateway.new(self)
     end
 
     def include_containers(*containers)
       containers.each do |cont|
-        @command_handlers.merge!(cont.instance_variable_get(:@command_handlers))
-        @commands.concat(cont.instance_variable_get(:@commands))
+        event_handlers, command_handlers, commands = [ 
+          :@event_handlers, :@command_handlers, :@commands
+        ].map { |var| cont.instance_variable_get(var) }
+
+        @event_handlers.merge!(event_handlers) unless event_handlers.nil?
+        @command_handlers.merge!(command_handlers) unless command_handlers.nil?
+        @commands.concat(commands) unless commands.nil?
       end
     end
 
