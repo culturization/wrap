@@ -13,8 +13,8 @@ module Wrap
     end
 
     def handle_event(name, &block)
-      @event_handlers ||= {}
-      @event_handlers[name] = block
+      @event_handlers ||= []
+      @event_handlers << [name, block]
     end
   end
 end

@@ -22,11 +22,11 @@ module Wrap
 
     def include_containers(*containers)
       containers.each do |cont|
-        event_handlers, command_handlers, commands = [ 
-          :@event_handlers, :@command_handlers, :@commands
+        event_handlers, command_handlers, commands = %i[
+          @event_handlers @command_handlers @commands
         ].map { |var| cont.instance_variable_get(var) }
 
-        @event_handlers.merge!(event_handlers) unless event_handlers.nil?
+        @event_handlers.concat(event_handlers) unless event_handlers.nil?
         @command_handlers.merge!(command_handlers) unless command_handlers.nil?
         @commands.concat(commands) unless commands.nil?
       end
@@ -55,6 +55,9 @@ module Wrap
         resp = handler.call(self, act)
         act.reply(wrap_msg(resp))
       end
+
+      # create classes for various events later
+      @event_handlers.select { _1[0] == event }.each { |handler| handler.call(bot, data) }
     end
 
     # default wrap_msg

@@ -24,7 +24,7 @@ module Wrap
       @focused = option['focused']
 
       if [OptionTypes::SUB_COMMAND, OptionTypes::SUB_COMMAND_GROUP].include?(@type)
-        @options = option['options'].map.to_h { [ _1['name'], self.class.new(_1) ] }
+        @options = option['options'].map.to_h { [_1['name'], self.class.new(_1)] }
       else
         @value = option['value']
       end
