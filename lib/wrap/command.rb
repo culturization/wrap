@@ -2,45 +2,60 @@
 
 module Wrap
   class SlashCommand
-    attr_reader :options
+    attr_reader :handlers
 
-    def initialize(bot, name, params = {}, &block)
-      @bot = bot
+    def initialize(name, params = {}, &block)
       @name = name.to_s
+      @params = params
       @options = []
+      @handlers = {}
 
       instance_eval(&block) if block_given?
-
-      @bot.app.register_command(params.merge(name: name, options: @options))
     end
 
     def group(name:, desc:, &block)
-      @options << SubcommandGroup.new([@name, name.to_s], desc, &block).to_h
+      group = SubcommandGroup.new([@name, name.to_s], desc, &block)
+      @options << group.to_h
+      @handlers.merge!(group.handlers)
     end
 
     def subcommand(name:, desc:, &block)
-      @options << Subcommand.new([@name, name.to_s], desc, &block).to_h
+      subcmd = Subcommand.new([@name, name.to_s], desc, &block)
+      @options << subcmd.to_h
+      @handlers[subcmd.path] = subcmd.handler
     end
 
     def handler(&block)
-      @bot.command_handlers[[@name]] << block
+      @handlers[[@name]] = block
     end
 
     def option(params)
       @options << params
     end
+
+    def to_h
+      @params.merge(
+        name: @name,
+        options: @options
+      )
+    end
   end
 
   class SubcommandGroup
+    attr_reader :handlers
+
     def initialize(path, desc, &block)
       @path = path
       @options = []
+      @handlers = {}
 
       instance_eval(&block)
     end
 
     def subcommand(name:, desc:, &block)
-      @options << Subcommand.new(@path + [name.to_s], desc, &block).to_h
+      subcmd = Subcommand.new(@path + [name.to_s], desc, &block)
+      @options << subcmd.to_h
+      @handlers[subcmd.path] = subcmd.handler
     end
 
     def to_h
@@ -54,6 +69,8 @@ module Wrap
   end
 
   class Subcommand
+    attr_reader :path, :handler
+
     def initialize(path, desc, &block)
       @path = path
       @options = []
@@ -62,7 +79,7 @@ module Wrap
     end
 
     def handler(&block)
-      @bot.command_handlers[@path] << block
+      @handler = block
     end
 
     def option(params)

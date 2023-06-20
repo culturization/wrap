@@ -49,7 +49,7 @@ module Wrap
       when 'INTERACTION_CREATE'
         act = interaction(nil, data)
 
-        return if act.type != 1 # CHAT_INPUT
+        return if act.type != 2 || act.command_type != 1
 
         handler = @command_handlers[act.command_path]
 

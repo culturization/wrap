@@ -64,14 +64,18 @@ module Wrap
     end
 
     def parse_options(opts)
-      opt = opts.first
-      if opts.size == 1 && [1, 2].include?(opt['type'])
+      @command_path = [@command_name]
+
+      return if opts.nil?
+
+      if opts.size == 1 && [1, 2].include?((opt = opts.first)['type'])
         opts = opt['options']
-        @command_path = [@command_name, opt['name']]
+        @command_path << opt['name']
 
         if opt['type'] == 2 # SUBCOMMAND GROUP
+          opt = opts.first
           opts = opt['options']
-          @command_path << opts.first['name']
+          @command_path << opt['name']
         end
       end
 
