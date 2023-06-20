@@ -47,11 +47,14 @@ module Wrap
         @app = app(nil, data)
       when 'MESSAGE_CREATE'
       when 'INTERACTION_CREATE'
-        handler = @command_handlers[data['data']['name']]
+        act = interaction(nil, data)
+
+        return if act.type != 1 # CHAT_INPUT
+
+        handler = @command_handlers[act.command_path]
 
         return if handler.nil?
 
-        act = interaction(nil, data)
         resp = handler.call(self, act)
         act.reply(wrap_msg(resp))
       end

@@ -6,7 +6,7 @@ module Wrap
 
     def initialize(bot, name, params = {}, &block)
       @bot = bot
-      @name = name
+      @name = name.to_s
       @options = []
 
       instance_eval(&block) if block_given?
@@ -15,11 +15,11 @@ module Wrap
     end
 
     def group(name:, desc:, &block)
-      @options << SubcommandGroup.new([@name, name], desc, &block).to_h
+      @options << SubcommandGroup.new([@name, name.to_s], desc, &block).to_h
     end
 
     def subcommand(name:, desc:, &block)
-      @options << Subcommand.new([@name, name], desc, &block).to_h
+      @options << Subcommand.new([@name, name.to_s], desc, &block).to_h
     end
 
     def handler(&block)
@@ -37,21 +37,19 @@ module Wrap
       @options = []
 
       instance_eval(&block)
+    end
 
-      @hash = {
+    def subcommand(name:, desc:, &block)
+      @options << Subcommand.new(@path + [name.to_s], desc, &block).to_h
+    end
+
+    def to_h
+      {
         name: path.last,
         type: 2,
         description: desc,
         options: @options
       }
-    end
-
-    def subcommand(name:, desc:, &block)
-      @options << Subcommand.new(name, desc, &block).to_h
-    end
-
-    def to_h
-      @hash
     end
   end
 
@@ -60,14 +58,7 @@ module Wrap
       @path = path
       @options = []
 
-      instance_eval(&block)
-
-      @hash = {
-        name: path.last,
-        type: 1,
-        description: desc,
-        options: @options
-      }
+      instance_eval(&block) if block_given?
     end
 
     def handler(&block)
@@ -79,7 +70,12 @@ module Wrap
     end
 
     def to_h
-      @hash
+      {
+        name: path.last,
+        type: 1,
+        description: desc,
+        options: @options
+      }
     end
   end
 end
