@@ -1,23 +1,29 @@
 # frozen_string_literal: true
 
 module Wrap
-  module Bot
+  class Bot
     include API
 
-    attr_reader :token, :ratelimits, :intents, :app
+    attr_reader :token, :ratelimits, :app
 
-    def initialize(token)
+    attr_accessor :intents
+
+    def initialize(token, &block)
       @token = token
 
       @command_handlers = {}
       @commands = []
-
       @event_handlers = {}
-
+      @error_handlers = {}
       @ratelimits = {}
 
-      @intents ||= 0
+      @intents = 0
       @gateway = Wrap::Gateway.new(self)
+
+      if block_given?
+        block.call(self)
+        run
+      end
     end
 
     def include_containers(*containers)
@@ -30,6 +36,16 @@ module Wrap
         @command_handlers.merge!(command_handlers) unless command_handlers.nil?
         @commands.concat(commands) unless commands.nil?
       end
+    end
+
+    def response_wrapper(&block)
+      @response_wrapper = block
+    end
+
+    def on_error(err_class, msg = nil, &block)
+      block = Proc.new { msg } unless msg.nil?
+
+      @error_handlers[err_class] = block
     end
 
     def run
@@ -47,25 +63,33 @@ module Wrap
         @app = app(nil, data)
       when 'MESSAGE_CREATE'
       when 'INTERACTION_CREATE'
-        act = interaction(nil, data)
-
-        return if act.type != 2 || act.command_type != 1
-
-        handler = @command_handlers[act.command_path]
-
-        return if handler.nil?
-
-        resp = handler.call(self, act)
-        act.reply(wrap_msg(resp))
+        handle_interaction(data)
       end
 
       # create classes for various events later
       @event_handlers.select { _1[0] == event }.each { |handler| handler.call(bot, data) }
     end
 
-    # default wrap_msg
-    def wrap_msg(resp)
-      { type: 4, data: { content: resp } }
+    def handle_interaction(data)
+      act = interaction(nil, data)
+
+      return if act.type != 2 || act.command_type != 1
+
+      handler = @command_handlers[act.command_path]
+
+      return if handler.nil?
+
+      resp = begin
+        handler.call(self, act)
+      rescue => e
+        err_handler = @error_handlers[e.class]
+
+        return LOGGER.error(e.full_message) if err_handler.nil?
+        
+        err_handler.call(e)
+      end
+
+      act.reply @response_wrapper.nil? ? resp : @response_wrapper.call(resp)
     end
 
     def channel(id, data = {})

@@ -79,7 +79,7 @@ module Wrap
         end
       end
 
-      @opts = opts.map { CommandOption.new(_1) }
+      @opts = opts.map.to_h { |option| [option['name'], CommandOption.new(option)] }
     end
   end
 end
