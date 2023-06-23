@@ -2,7 +2,8 @@
 
 module Wrap
   class Bot
-    include API
+    include Wrap::API
+    include Wrap::Container
 
     attr_reader :token, :ratelimits, :app
 
@@ -13,17 +14,14 @@ module Wrap
 
       @command_handlers = {}
       @commands = []
-      @event_handlers = {}
+      @event_handlers = []
       @error_handlers = {}
       @ratelimits = {}
 
       @intents = 0
       @gateway = Wrap::Gateway.new(self)
 
-      if block_given?
-        block.call(self)
-        run
-      end
+      block.call(self) if block_given?
     end
 
     def include_containers(*containers)
@@ -80,7 +78,7 @@ module Wrap
       return if handler.nil?
 
       resp = begin
-        handler.call(self, act)
+        handler.call(act)
       rescue => e
         err_handler = @error_handlers[e.class]
 

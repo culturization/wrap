@@ -46,6 +46,7 @@ module Wrap
 
     def initialize(path, desc, &block)
       @path = path
+      @desc = desc
       @options = []
       @handlers = {}
 
@@ -62,7 +63,7 @@ module Wrap
       {
         name: path.last,
         type: 2,
-        description: desc,
+        description: @desc,
         options: @options
       }
     end
@@ -73,6 +74,7 @@ module Wrap
 
     def initialize(path, desc, &block)
       @path = path
+      @desc = desc
       @options = []
 
       instance_eval(&block) if block_given?
@@ -90,7 +92,7 @@ module Wrap
       {
         name: path.last,
         type: 1,
-        description: desc,
+        description: @desc,
         options: @options
       }
     end
