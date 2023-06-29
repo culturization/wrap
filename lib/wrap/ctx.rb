@@ -2,13 +2,16 @@
 
 module Wrap
   class Context
-    attr_reader :event, :bot
+    attr_reader :ctx, :bot
   
-    def initialize(bot, event)
+    def initialize(bot, ctx)
       @bot = bot
-      @event = event
+      @ctx = ctx
+      @helpers = @bot.helpers.map.to_h { |name, meth| [ name, meth.bind(self) ] }
     end
 
-    def helper(...) = @bot.helper(...)
+    def method_missing(name, ...)
+      @helpers.fetch(name).call(...)
+    end
   end
 end

@@ -36,7 +36,7 @@ module Wrap
       @commands.concat(commands) unless commands.nil?
 
       helpers = cont.instance_methods(false).map.to_h do |meth|
-        [ meth, cont.instance_method(meth).bind(self) ]
+        [ meth, cont.instance_method(meth) ]
       end
       @helpers.merge!(helpers)
     end
@@ -97,10 +97,6 @@ module Wrap
       end
 
       act.reply @response_wrapper.nil? ? resp : @response_wrapper.call(resp)
-    end
-
-    def helper(name, ...)
-      @helpers.fetch(name).call(...)
     end
 
     def channel(id, data = {})
