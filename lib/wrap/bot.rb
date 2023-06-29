@@ -5,7 +5,7 @@ module Wrap
     include Wrap::API
     include Wrap::Container
 
-    attr_reader :token, :ratelimits, :app
+    attr_reader :token, :ratelimits, :self_app, :helpers
 
     attr_accessor :intents
 
@@ -16,24 +16,33 @@ module Wrap
       @commands = []
       @event_handlers = []
       @error_handlers = {}
+      @helpers = {}
       @ratelimits = {}
 
       @intents = 0
+
       @gateway = Wrap::Gateway.new(self)
 
       block.call(self) if block_given?
     end
 
-    def include_containers(*containers)
-      containers.each do |cont|
-        event_handlers, command_handlers, commands = %i[
-          @event_handlers @command_handlers @commands
-        ].map { |var| cont.instance_variable_get(var) }
+    def include_container(cont)
+      event_handlers, command_handlers, commands = %i[
+        @event_handlers @command_handlers @commands
+      ].map { |var| cont.instance_variable_get(var) }
 
-        @event_handlers.concat(event_handlers) unless event_handlers.nil?
-        @command_handlers.merge!(command_handlers) unless command_handlers.nil?
-        @commands.concat(commands) unless commands.nil?
+      @event_handlers.concat(event_handlers) unless event_handlers.nil?
+      @command_handlers.merge!(command_handlers) unless command_handlers.nil?
+      @commands.concat(commands) unless commands.nil?
+
+      helpers = cont.instance_methods(false).map.to_h do |meth|
+        [ meth, cont.instance_method(meth).bind(self) ]
       end
+      @helpers.merge!(helpers)
+    end
+
+    def include_helpers(*helpers)
+      helpers.each(&@context.method(:include))
     end
 
     def response_wrapper(&block)
@@ -55,22 +64,24 @@ module Wrap
     end
 
     def dispatch(event, data)
+      event = event.downcase.to_sym
+
       case event
-      when 'READY'
+      when :ready
         # save application
-        @app = app(nil, data)
-      when 'MESSAGE_CREATE'
-      when 'INTERACTION_CREATE'
+        @self_app = app(nil, data['application'])
+      when :message_create
+        data = message(nil, data)
+      when :interaction_create
+        data = interaction(nil, data)
         handle_interaction(data)
       end
 
       # create classes for various events later
-      @event_handlers.select { _1[0] == event }.each { |handler| handler.call(bot, data) }
+      @event_handlers.select { _1[0] == event }.each { |handler| handler[1].call(data) }
     end
 
-    def handle_interaction(data)
-      act = interaction(nil, data)
-
+    def handle_interaction(act)
       return if act.type != 2 || act.command_type != 1
 
       handler = @command_handlers[act.command_path]
@@ -78,7 +89,7 @@ module Wrap
       return if handler.nil?
 
       resp = begin
-        handler.call(act)
+        instance_exec(act, &handler)
       rescue => e
         err_handler = @error_handlers[e.class]
 
@@ -88,6 +99,10 @@ module Wrap
       end
 
       act.reply @response_wrapper.nil? ? resp : @response_wrapper.call(resp)
+    end
+
+    def helper(name, ...)
+      @helpers.fetch(name).call(...)
     end
 
     def channel(id, data = {})
@@ -106,8 +121,12 @@ module Wrap
       Wrap::Interaction.new(self, id, data)
     end
 
+    def message(id, data = {})
+      Wrap::Message.new(self, id, data)
+    end
+
     def overwrite_commands
-      @app.bulk_overwrite(@commands)
+      @self_app.bulk_overwrite(@commands)
     end
   end
 end

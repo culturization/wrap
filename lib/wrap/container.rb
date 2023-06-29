@@ -18,7 +18,7 @@ module Wrap
       @command_handlers.merge!(cmd.handlers)
     end
 
-    def event(name, &block)
+    def on_event(name, &block)
       @event_handlers ||= []
       @event_handlers << [name, block]
       # TODO: also update intents

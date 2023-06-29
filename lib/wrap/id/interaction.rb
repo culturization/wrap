@@ -17,12 +17,7 @@ module Wrap
                 :command_id, :command_name, :command_type, :resolved, :opts, :command_path,
                 :custom_id, :component_type, :values, :components
 
-    def initialize(...)
-      super(...)
-      initialize_instance_vars
-    end
-
-    def initialize_instance_vars
+    def init_vars
       @id = @data['id']
       @application = Application.new(@bot, @data['application_id'])
       @type = @data['type']
@@ -40,6 +35,8 @@ module Wrap
       return if @type == InteractionTypes::PING
 
       inner_data = @data['data']
+
+      return if inner_data.nil?
 
       case @type
       when InteractionTypes::APPLICATION_COMMAND, InteractionTypes::APPLICATION_COMMAND_AUTOCOMPLETE
@@ -66,7 +63,7 @@ module Wrap
     def parse_options(opts)
       @command_path = [@command_name]
 
-      return if opts.nil?
+      return @opts = {} if opts.nil?
 
       if opts.size == 1 && [1, 2].include?((opt = opts.first)['type'])
         opts = opt['options']

@@ -7,7 +7,8 @@ module Wrap
     def initialize(bot, guild, user_id, data = {})
       @bot = bot
       @guild = guild
-      @user_id = user_id || data['user']['id']
+
+      @user_id = user_id || data['user']&.[]('id')
       @data = data
     end
 
@@ -25,8 +26,8 @@ module Wrap
            .max_by { |role| role['position'] }
     end
 
-    def ban
-      @guild.ban(@user_id)
+    def ban(reason: nil)
+      @guild.ban(@user_id, reason: reason)
     end
 
     def higher_than?(other, roles = nil)

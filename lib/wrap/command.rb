@@ -22,7 +22,7 @@ module Wrap
     def subcommand(name:, desc:, &block)
       subcmd = Subcommand.new([@name, name.to_s], desc, &block)
       @options << subcmd.to_h
-      @handlers[subcmd.path] = subcmd.handler
+      @handlers[subcmd.path] = subcmd.handler_
     end
 
     def handler(&block)
@@ -56,7 +56,7 @@ module Wrap
     def subcommand(name:, desc:, &block)
       subcmd = Subcommand.new(@path + [name.to_s], desc, &block)
       @options << subcmd.to_h
-      @handlers[subcmd.path] = subcmd.handler
+      @handlers[subcmd.path] = subcmd.handler_
     end
 
     def to_h
@@ -70,7 +70,7 @@ module Wrap
   end
 
   class Subcommand
-    attr_reader :path, :handler
+    attr_reader :path, :handler_
 
     def initialize(path, desc, &block)
       @path = path
@@ -81,7 +81,7 @@ module Wrap
     end
 
     def handler(&block)
-      @handler = block
+      @handler_ = block
     end
 
     def option(params)

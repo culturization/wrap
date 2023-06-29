@@ -8,6 +8,8 @@ module Wrap
       @bot = bot
       @id = id || data['id']
       @data = data
+
+      init_vars if defined? init_vars
     end
   end
 end

@@ -4,7 +4,7 @@ module Wrap
   module API
     API_BASE = 'https://discord.com/api/v10/'
 
-    def api_call(method, path, rl_key = nil, data = nil)
+    def api_call(method, path, rl_key = nil, data = nil, headers = {})
       rl = @ratelimits[rl_key]
 
       if rl && rl[:reset] > Time.now && (rl[:remaining]).zero?
@@ -12,7 +12,7 @@ module Wrap
         raise RateLimitError, rl
       end
 
-      res = raw_api_call(method, path, token, data)
+      res = raw_api_call(method, path, data, headers)
 
       @ratelimits[rl_key] = {
         remaining: res['X-RateLimit-Remaining'].to_i,
@@ -26,7 +26,7 @@ module Wrap
       json
     end
 
-    def raw_api_call(method, path, _token, data)
+    def raw_api_call(method, path, data, headers)
       uri = URI.join(API_BASE, path)
 
       http = Net::HTTP.new(uri.hostname, uri.port)
@@ -37,6 +37,7 @@ module Wrap
         'Authorization' => @token, 'Content-Type' => 'application/json'
       )
       req.body = data.to_json if data
+      headers.each { |key, val| req[key] = val }
 
       http.request(req)
     end

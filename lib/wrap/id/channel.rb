@@ -11,5 +11,9 @@ module Wrap
     def get
       @data = @bot.api_call('Get', "channels/#{@id}", [:c, @id])
     end
+
+    def message(id)
+      @bot.message(id, channel_id: @id)
+    end
   end
 end

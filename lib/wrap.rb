@@ -19,6 +19,7 @@ require 'wrap/id/channel'
 require 'wrap/id/guild'
 require 'wrap/id/interaction'
 require 'wrap/id/member'
+require 'wrap/id/message'
 
 require 'wrap/bot'
 
