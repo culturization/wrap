@@ -41,10 +41,6 @@ module Wrap
       @helpers.merge!(helpers)
     end
 
-    def include_helpers(*helpers)
-      helpers.each(&@context.method(:include))
-    end
-
     def response_wrapper(&block)
       @response_wrapper = block
     end
@@ -78,7 +74,9 @@ module Wrap
       end
 
       # create classes for various events later
-      @event_handlers.select { _1[0] == event }.each { |handler| handler[1].call(data) }
+      @event_handlers.select { _1[0] == event }.each do |handler|
+        Wrap::Context.new(self, data).instance_exec(&handler[1])
+      end
     end
 
     def handle_interaction(act)
@@ -89,7 +87,7 @@ module Wrap
       return if handler.nil?
 
       resp = begin
-        instance_exec(act, &handler)
+        Wrap::Context.new(self, act).instance_exec(act, &handler)
       rescue => e
         err_handler = @error_handlers[e.class]
 

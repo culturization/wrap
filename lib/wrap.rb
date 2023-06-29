@@ -13,6 +13,7 @@ require 'wrap/id_object'
 require 'wrap/container'
 require 'wrap/option'
 require 'wrap/command'
+require 'wrap/ctx'
 
 require 'wrap/id/application'
 require 'wrap/id/channel'
